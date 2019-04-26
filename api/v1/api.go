@@ -13,10 +13,12 @@ import (
 )
 
 const (
-	defaultTimeout          time.Duration = 15 * time.Second
-	defaultContentType      string        = "application/json"
-	CreateClientEndpoint    string        = "/v1/client"
-	CreateComponentEndpoint string        = "/v1/component"
+	defaultTimeout                 time.Duration = 15 * time.Second
+	defaultContentType             string        = "application/json"
+	CreateClientEndpoint           string        = "/v1/client"
+	CreateComponentEndpoint        string        = "/v1/component"
+	FindComponentEndpoint          string        = "/v1/component/"
+	SearchComponentByLabelEndpoint string        = "/v1/component/label"
 )
 
 var (
@@ -87,4 +89,47 @@ func (api *v1) CreateComponent(component models.Component) (string, error) {
 	}
 
 	return string(ref), nil
+}
+
+func (api *v1) FindComponent(componentName string) (models.Component, error) {
+	var comp models.Component
+
+	nameSearchParam := "?search=name"
+	resp, err := api.httpClient.Get(api.URL + FindComponentEndpoint + componentName + nameSearchParam)
+	if err != nil {
+		return comp, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return comp, fmt.Errorf("Unexpected response from statuspage: %d", resp.StatusCode)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&comp)
+	return comp, err
+}
+
+func (api *v1) GetComponentsWithLabels(labels ...string) ([]models.Component, error) {
+	var components []models.Component
+	l := models.ComponentLabels{
+		Labels: labels,
+	}
+
+	body, err := json.Marshal(l)
+	if err != nil {
+		return components, err
+	}
+
+	resp, err := api.httpClient.Post(api.URL+SearchComponentByLabelEndpoint, defaultContentType, bytes.NewReader(body))
+	if err != nil {
+		return components, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return components, fmt.Errorf("Unexpected response from statuspage: %d", resp.StatusCode)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&components)
+	return components, err
 }

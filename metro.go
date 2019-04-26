@@ -43,3 +43,11 @@ func (c *client) CreateClient(client models.Client) (string, error) {
 func (c *client) CreateComponent(component models.Component) (string, error) {
 	return c.api.CreateComponent(component)
 }
+
+func (c *client) FindComponent(componentName string) (models.Component, error) {
+	return c.api.FindComponent(componentName)
+}
+
+func (c *client) GetComponentsWithLabels(labels ...string) ([]models.Component, error) {
+	return c.api.GetComponentsWithLabels(labels...)
+}
