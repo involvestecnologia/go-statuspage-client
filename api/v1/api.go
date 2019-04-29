@@ -21,13 +21,6 @@ const (
 	SearchComponentByLabelEndpoint string        = "/v1/component/label"
 )
 
-var (
-	V1Routes = map[string]interface{}{
-		CreateClientEndpoint:    nil,
-		CreateComponentEndpoint: nil,
-	}
-)
-
 type v1 struct {
 	URL        string
 	httpClient http.Client
