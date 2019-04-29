@@ -42,7 +42,6 @@ func TestCreateComponent(t *testing.T) {
 	gock.New(uri).
 		Post(v1.CreateComponentEndpoint).
 		Reply(http.StatusCreated).
-		AddHeader("Content-Type", "application/json").
 		BodyString("testcomponent-ref")
 
 	component.Name = "Test"
@@ -73,7 +72,6 @@ func TestCreateClient(t *testing.T) {
 	gock.New(uri).
 		Post(v1.CreateClientEndpoint).
 		Reply(http.StatusCreated).
-		AddHeader("Content-Type", "application/json").
 		BodyString("testclient-ref")
 
 	client.Name = "TestClient"
@@ -81,5 +79,60 @@ func TestCreateClient(t *testing.T) {
 	ref, err = metroV1.CreateClient(client)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, ref)
+
+}
+
+func TestFindComponent(t *testing.T) {
+	defer gock.OffAll()
+
+	metroV1 := v1.NewAPIV1(uri)
+	componentName := "component-test"
+
+	gock.New(uri).
+		Get(v1.FindComponentEndpoint+componentName+"fail").
+		MatchParam("search", "name").
+		Reply(http.StatusBadRequest)
+
+	ref, err := metroV1.FindComponent(componentName + "fail")
+	assert.Error(t, err)
+	assert.Empty(t, ref)
+
+	gock.Off()
+	gock.New(uri).
+		Get(v1.FindComponentEndpoint+componentName).
+		MatchParam("search", "name").
+		Reply(http.StatusOK).
+		JSON(models.Component{Ref: "test-ref", Name: componentName})
+
+	comp, err := metroV1.FindComponent("component-test")
+	assert.NoError(t, err)
+	assert.Equal(t, componentName, comp.Name)
+
+}
+
+func TestGetComponentsWithLabels(t *testing.T) {
+	defer gock.OffAll()
+
+	metroV1 := v1.NewAPIV1(uri)
+
+	gock.New(uri).
+		Post(v1.SearchComponentByLabelEndpoint).
+		JSON(map[string]interface{}{"labels": []string{"invalid-ref"}}).
+		Reply(http.StatusBadRequest)
+
+	ref, err := metroV1.GetComponentsWithLabels("invalid-ref")
+	assert.Error(t, err)
+	assert.Empty(t, ref)
+
+	gock.Off()
+	gock.New(uri).
+		Post(v1.SearchComponentByLabelEndpoint).
+		JSON(map[string]interface{}{"labels": []string{"valid-ref"}}).
+		Reply(http.StatusOK).
+		JSON([]models.Component{models.Component{Ref: "valid-ref"}})
+
+	comps, err := metroV1.GetComponentsWithLabels("valid-ref")
+	assert.NoError(t, err)
+	assert.Equal(t, "valid-ref", comps[0].Ref)
 
 }
