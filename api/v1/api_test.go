@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/h2non/gock"
+	"gopkg.in/h2non/gock.v1"
 	"github.com/involvestecnologia/go-statuspage-client/api"
 	v1 "github.com/involvestecnologia/go-statuspage-client/api/v1"
 	"github.com/involvestecnologia/statuspage/models"
