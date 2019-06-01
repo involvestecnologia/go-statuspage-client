@@ -19,6 +19,7 @@ const (
 	CreateComponentEndpoint        string        = "/v1/component"
 	FindComponentEndpoint          string        = "/v1/component/"
 	SearchComponentByLabelEndpoint string        = "/v1/component/label"
+	ListIncidentsEndpoint          string        = "/v1/incidents"
 )
 
 type v1 struct {
@@ -125,4 +126,33 @@ func (api *v1) GetComponentsWithLabels(labels ...string) ([]models.Component, er
 
 	err = json.NewDecoder(resp.Body).Decode(&components)
 	return components, err
+}
+
+func (api *v1) GetIncidentsFromPeriod(startDt, endDt time.Time, unresolvedOnly bool) ([]models.Incident, error) {
+	var incidents []models.Incident
+
+	req, err := http.NewRequest("GET", api.URL+ListIncidentsEndpoint, nil)
+	if err != nil {
+		return incidents, err
+	}
+
+	q := req.URL.Query()
+
+	if unresolvedOnly {
+		q.Add("unresolved", "true")
+	}
+
+	q.Add("startDate", startDt.Format(time.RFC3339))
+	q.Add("endDate", endDt.Format(time.RFC3339))
+
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := api.httpClient.Do(req)
+	if err != nil {
+		return incidents, err
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&incidents)
+	return incidents, err
 }

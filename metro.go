@@ -2,6 +2,7 @@ package client
 
 import (
 	"log"
+	"time"
 
 	"github.com/involvestecnologia/go-statuspage-client/api"
 	v1 "github.com/involvestecnologia/go-statuspage-client/api/v1"
@@ -50,4 +51,8 @@ func (c *client) FindComponent(componentName string) (models.Component, error) {
 
 func (c *client) GetComponentsWithLabels(labels ...string) ([]models.Component, error) {
 	return c.api.GetComponentsWithLabels(labels...)
+}
+
+func (c *client) GetIncidentsFromPeriod(startDt, endDt time.Time, unresolvedOnly bool) ([]models.Incident, error) {
+	return c.api.GetIncidentsFromPeriod(startDt, endDt, unresolvedOnly)
 }

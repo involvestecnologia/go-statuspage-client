@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"testing"
 
-	"gopkg.in/h2non/gock.v1"
 	"github.com/involvestecnologia/go-statuspage-client/api"
 	v1 "github.com/involvestecnologia/go-statuspage-client/api/v1"
 	"github.com/involvestecnologia/statuspage/models"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/h2non/gock.v1"
 )
 
 const uri = "http://localhost:8080"

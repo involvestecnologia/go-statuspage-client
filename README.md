@@ -8,6 +8,7 @@ This is a client to easily communicate with the [Metronome API](https://github.c
  - Find a Component by Name
  - Find Components by one or more labels
  - Create a Client
+ - Get Incidents from a specified period
 
 ## Usage:
 
