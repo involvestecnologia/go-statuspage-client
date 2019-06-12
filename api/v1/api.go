@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/involvestecnologia/go-statuspage-client/api"
@@ -82,7 +83,7 @@ func (api *v1) CreateComponent(component models.Component) (string, error) {
 		return "", err
 	}
 
-	return string(ref), nil
+	return strings.Replace(string(ref), `"`, "", -1), nil
 }
 
 func (api *v1) FindComponent(componentName string) (models.Component, error) {
